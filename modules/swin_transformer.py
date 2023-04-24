@@ -13,7 +13,7 @@ import torch
 import torch.nn as nn
 
 from timm.models.layers import PatchEmbed, Mlp, DropPath, ClassifierHead, to_2tuple, to_ntuple, trunc_normal_, \
-    _assert, use_fused_attn
+    _assert
 
 
 
@@ -105,7 +105,7 @@ class WindowAttention(nn.Module):
         head_dim = head_dim or dim // num_heads
         attn_dim = head_dim * num_heads
         self.scale = head_dim ** -0.5
-        self.fused_attn = use_fused_attn(experimental=True)  # NOTE not tested for prime-time yet
+        # self.fused_attn = use_fused_attn(experimental=True)  # NOTE not tested for prime-time yet
 
         # define a parameter table of relative position bias, shape: 2*Wh-1 * 2*Ww-1, nH
         self.relative_position_bias_table = nn.Parameter(torch.zeros((2 * win_h - 1) * (2 * win_w - 1), num_heads))
