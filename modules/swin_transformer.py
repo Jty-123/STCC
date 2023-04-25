@@ -258,6 +258,7 @@ class SwinTransformerBlock(nn.Module):
         self.register_buffer("attn_mask", attn_mask)
 
     def forward(self, x):
+        print(x.shape)
         B, H, W, C = x.shape
         _assert(H == self.input_resolution[0], "input feature has wrong size")
         _assert(W == self.input_resolution[1], "input feature has wrong size")
@@ -476,7 +477,6 @@ class SwinTransformer(nn.Module):
             attn_drop_rate: float = 0.,
             drop_path_rate: float = 0.1,
             norm_layer: Union[str, Callable] = nn.LayerNorm,
-            weight_init: str = '',
             **kwargs,
     ):
         """
@@ -562,10 +562,7 @@ class SwinTransformer(nn.Module):
             num_classes,
             pool_type=global_pool,
             drop_rate=drop_rate,
-            input_fmt=self.output_fmt,
         )
-        if weight_init != 'skip':
-            self.init_weights(weight_init)
 
 
     def reset_classifier(self, num_classes, global_pool=None):

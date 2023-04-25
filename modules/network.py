@@ -30,6 +30,7 @@ class Network_STCC(nn.Module):
         )
 
     def forward(self, x_i, x_j):
+        print(x_i.shape)
         h_i = self.stcc(x_i)
         h_j = self.stcc(x_j)
 
