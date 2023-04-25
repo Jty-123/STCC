@@ -313,12 +313,28 @@ class PatchMerging(nn.Module):
         self.reduction = nn.Linear(4 * dim, self.out_dim, bias=False)
 
     def forward(self, x):
-        B, H, W, C = x.shape
-        _assert(H % 2 == 0, f"x height ({H}) is not even.")
-        _assert(W % 2 == 0, f"x width ({W}) is not even.")
-        x = x.reshape(B, H // 2, 2, W // 2, 2, C).permute(0, 1, 3, 4, 2, 5).flatten(3)
+        H,W = self.input_resolution
+        B, L, C = x.shape
+        assert L == H * W, "input feature has wrong size"
+        assert H % 2 == 0 and W % 2 == 0, f"x size ({H}*{W}) are not even."
+        
+        x = x.view(B, H, W, C)
+        '''
+        取切片：
+            -第一个是在batch维度上，都选
+            - 二、三都是在H W的维度上间隔的去选
+            - 取完后拼接（作为不同的通道）
+        '''
+        x0 = x[:, 0::2, 0::2, :]  # B H/2 W/2 C
+        x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
+        x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
+        x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
+        x = torch.cat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
+        x = x.view(B, -1, 4 * C)  # B H/2*W/2 4*C
+
         x = self.norm(x)
         x = self.reduction(x)
+
         return x
 
 
