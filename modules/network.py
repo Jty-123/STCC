@@ -30,9 +30,7 @@ class Network_STCC(nn.Module):
         )
 
     def forward(self, x_i, x_j):
-        print("x_i.shape:",x_i.shape)
         h_i = self.stcc(x_i)
-        print("h_i.shape:",h_i.shape)
         h_j = self.stcc(x_j)
 
         z_i = normalize(self.instance_projector(h_i), dim=1)
