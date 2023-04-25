@@ -310,6 +310,7 @@ class PatchMerging(nn.Module):
         super().__init__()
         self.dim = dim
         self.out_dim = out_dim or 2 * dim
+        self.input_resolution = input_resolution
         self.norm = norm_layer(4 * dim)
         self.reduction = nn.Linear(4 * dim, self.out_dim, bias=False)
 
@@ -387,7 +388,7 @@ class SwinTransformerStage(nn.Module):
         if downsample:
             self.downsample = PatchMerging(
                 dim=dim,
-                input_resolution=self.input_resolution,
+                input_resolutio=input_resolution,
                 out_dim=out_dim,
                 norm_layer=norm_layer,
             )
