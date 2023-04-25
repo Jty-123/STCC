@@ -518,7 +518,6 @@ class SwinTransformer(nn.Module):
             in_chans=in_chans,
             embed_dim=embed_dim[0],
             norm_layer=norm_layer,
-            output_fmt='NHWC',
         )
         self.patch_grid = self.patch_embed.grid_size
 
