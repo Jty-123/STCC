@@ -388,7 +388,7 @@ class SwinTransformerStage(nn.Module):
         if downsample:
             self.downsample = PatchMerging(
                 dim=dim,
-                input_resolutio=input_resolution,
+                input_resolution=input_resolution,
                 out_dim=out_dim,
                 norm_layer=norm_layer,
             )
