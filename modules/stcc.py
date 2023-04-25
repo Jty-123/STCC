@@ -94,6 +94,6 @@ class ConvStem(nn.Module):
 
 def stcc_tiny(**kwargs):
     model = SwinTransformer_STCC(
-        imgsize=224, patch_size=4, embed_dim=96, depth=(2, 2, 6, 2), num_heads=(3, 6, 12, 24),
+        img_size=224, patch_size=4, embed_dim=96, depth=(2, 2, 6, 2), num_heads=(3, 6, 12, 24),
         norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
     return model
