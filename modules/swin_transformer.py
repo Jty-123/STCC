@@ -297,6 +297,7 @@ class PatchMerging(nn.Module):
     def __init__(
             self,
             dim: int,
+            input_resolution: _int_or_tuple_2_t,
             out_dim: Optional[int] = None,
             norm_layer: Callable = nn.LayerNorm,
     ):
@@ -386,6 +387,7 @@ class SwinTransformerStage(nn.Module):
         if downsample:
             self.downsample = PatchMerging(
                 dim=dim,
+                input_resolution=self.input_resolution,
                 out_dim=out_dim,
                 norm_layer=norm_layer,
             )
