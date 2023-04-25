@@ -10,7 +10,7 @@ class Network_STCC(nn.Module):
         self.cluster_num = class_num
         self.mid_dim = self.stcc.dim * 4
         self.instance_projector = nn.Sequential(
-            nn.Linear(self.stcc.dim, self.mid_dim),
+            nn.Linear(self.stcc.dim*8, self.mid_dim),
             nn.BatchNorm1d(self.mid_dim),
             nn.ReLU(inplace=True),
             nn.Linear(self.mid_dim, self.mid_dim),
@@ -19,7 +19,7 @@ class Network_STCC(nn.Module):
             nn.Linear(self.mid_dim, self.feature_dim),
         )
         self.cluster_projector = nn.Sequential(
-            nn.Linear(self.stcc.dim, self.mid_dim),
+            nn.Linear(self.stcc.dim*8, self.mid_dim),
             nn.BatchNorm1d(self.mid_dim),
             nn.ReLU(inplace=True),
             nn.Linear(self.mid_dim, self.mid_dim),
