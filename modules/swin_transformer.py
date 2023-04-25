@@ -584,7 +584,7 @@ class SwinTransformer(nn.Module):
         x = self.patch_embed(x)
         x = self.layers(x)
         x = self.norm(x)
-        return x
+        return self.pre_logits(x[:, 0])
 
     def forward_head(self, x, pre_logits: bool = False):
         return self.head(x, pre_logits=True) if pre_logits else self.head(x)
