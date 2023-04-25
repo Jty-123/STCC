@@ -531,7 +531,7 @@ class SwinTransformer(nn.Module):
             norm_layer=norm_layer,
         )
         self.patch_grid = self.patch_embed.grid_size
-
+        self.pre_logits = nn.Identity()
         # build layers
         head_dim = to_ntuple(self.num_layers)(head_dim)
         window_size = to_ntuple(self.num_layers)(window_size)
