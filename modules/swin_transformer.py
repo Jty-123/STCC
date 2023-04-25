@@ -74,7 +74,6 @@ class WindowAttention(nn.Module):
     """ Window based multi-head self attention (W-MSA) module with relative position bias.
     It supports shifted and non-shifted windows.
     """
-    fused_attn: torch.jit.Final[bool]
 
     def __init__(
             self,
@@ -137,28 +136,19 @@ class WindowAttention(nn.Module):
         qkv = self.qkv(x).reshape(B_, N, 3, self.num_heads, -1).permute(2, 0, 3, 1, 4)
         q, k, v = qkv.unbind(0)
 
-        if self.fused_attn:
-            attn_mask = self._get_rel_pos_bias()
-            if mask is not None:
-                num_win = mask.shape[0]
-                mask = mask.view(1, num_win, 1, N, N).expand(B_ // num_win, -1, self.num_heads, -1, -1)
-                attn_mask = attn_mask + mask.reshape(-1, self.num_heads, N, N)
-            x = torch.nn.functional.scaled_dot_product_attention(
-                q, k, v,
-                attn_mask=attn_mask,
-                dropout_p=self.attn_drop.p,
-            )
-        else:
-            q = q * self.scale
-            attn = q @ k.transpose(-2, -1)
-            attn = attn + self._get_rel_pos_bias()
-            if mask is not None:
-                num_win = mask.shape[0]
-                attn = attn.view(-1, num_win, self.num_heads, N, N) + mask.unsqueeze(1).unsqueeze(0)
-                attn = attn.view(-1, self.num_heads, N, N)
-            attn = self.softmax(attn)
-            attn = self.attn_drop(attn)
-            x = attn @ v
+ 
+ 
+
+        q = q * self.scale
+        attn = q @ k.transpose(-2, -1)
+        attn = attn + self._get_rel_pos_bias()
+        if mask is not None:
+            num_win = mask.shape[0]
+            attn = attn.view(-1, num_win, self.num_heads, N, N) + mask.unsqueeze(1).unsqueeze(0)
+            attn = attn.view(-1, self.num_heads, N, N)
+        attn = self.softmax(attn)
+        attn = self.attn_drop(attn)
+        x = attn @ v
 
         x = x.transpose(1, 2).reshape(B_, N, -1)
         x = self.proj(x)
@@ -258,14 +248,17 @@ class SwinTransformerBlock(nn.Module):
         self.register_buffer("attn_mask", attn_mask)
 
     def forward(self, x):
-        print(x.shape)
-        B, H, W, C = x.shape
-        _assert(H == self.input_resolution[0], "input feature has wrong size")
-        _assert(W == self.input_resolution[1], "input feature has wrong size")
+        H, W = self.input_resolution  # input_resolution, (H, W) for this example. (B, H, W, C) for this module. (B, C, H, W) for this example. (B, C, H, W) for this module. (B, C, H, W) for thi
+        B, L, C = x.shape
+
+
+        assert L == H * W, "input feature has wrong size"
+
 
         shortcut = x
         x = self.norm1(x)
 
+        x = x.view(B, H, W, C)
         # cyclic shift
         if self.shift_size > 0:
             shifted_x = torch.roll(x, shifts=(-self.shift_size, -self.shift_size), dims=(1, 2))
@@ -289,12 +282,11 @@ class SwinTransformerBlock(nn.Module):
         else:
             x = shifted_x
 
+        x = x.view(B, H * W, C)
         # FFN
         x = shortcut + self.drop_path(x)
 
-        x = x.reshape(B, -1, C)
         x = x + self.drop_path(self.mlp(self.norm2(x)))
-        x = x.reshape(B, H, W, C)
         return x
 
 
