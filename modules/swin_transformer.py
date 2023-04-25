@@ -570,16 +570,22 @@ class SwinTransformer(nn.Module):
         self.head.reset(num_classes, pool_type=global_pool)
 
     def forward_features(self, x):
+        print("1--------",x.shape)
         x = self.patch_embed(x)
+        print("2--------",x.shape)
         x = self.layers(x)
+        print("3--------",x.shape)
         x = self.norm(x)
+        print("4--------",x.shape)
         return x
 
     def forward_head(self, x, pre_logits: bool = False):
         return self.head(x, pre_logits=True) if pre_logits else self.head(x)
 
     def forward(self, x):
+        print("ST1:",x.shape)
         x = self.forward_features(x)
+        print("ST2:",x.shape)
         x = self.forward_head(x)
         return x
 
