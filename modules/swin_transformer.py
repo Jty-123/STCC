@@ -584,7 +584,7 @@ class SwinTransformer(nn.Module):
                 if module.bias is not None:
                     init.constant_(module.bias, 0)
 
-                    
+
     def reset_classifier(self, num_classes, global_pool=None):
         self.num_classes = num_classes
         self.head.reset(num_classes, pool_type=global_pool)
@@ -601,7 +601,6 @@ class SwinTransformer(nn.Module):
 
     def forward(self, x):
         x = self.forward_features(x)
-        print(x.shape)
         return x
 
 
