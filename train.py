@@ -148,6 +148,7 @@ if __name__ == "__main__":
     model = network.Network_STCC(stcc, args.feature_dim, class_num)
     model = model.to('cuda')
 
+
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
 
     if args.reload:

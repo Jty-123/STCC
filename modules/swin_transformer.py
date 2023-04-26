@@ -11,7 +11,7 @@ from typing import Callable, List, Optional, Tuple, Union
 
 import torch
 import torch.nn as nn
-
+import torch.nn.init as init
 from timm.models.layers import PatchEmbed, Mlp, DropPath, ClassifierHead, to_2tuple, to_ntuple, trunc_normal_, \
     _assert
 
@@ -574,8 +574,17 @@ class SwinTransformer(nn.Module):
             pool_type=global_pool,
             drop_rate=drop_rate,
         )
+        self._initialize_weights()
 
 
+    def _initialize_weights(self):
+        for module in self.modules():
+            if isinstance(module, nn.Linear):
+                init.xavier_uniform_(module.weight)
+                if module.bias is not None:
+                    init.constant_(module.bias, 0)
+
+                    
     def reset_classifier(self, num_classes, global_pool=None):
         self.num_classes = num_classes
         self.head.reset(num_classes, pool_type=global_pool)
