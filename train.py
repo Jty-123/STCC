@@ -41,7 +41,7 @@ if __name__ == "__main__":
     torch.cuda.manual_seed(args.seed)
     np.random.seed(args.seed)
     
-    train_writer = SummaryWriter(log_dir="runs/CIFAR-10")
+    train_writer = SummaryWriter(log_dir="runs/RSOD")
     # prepare data
     if args.dataset =="CIFAR-10":        
         train_dataset = torchvision.datasets.CIFAR10(
